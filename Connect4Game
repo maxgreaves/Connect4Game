@@ -1,0 +1,231 @@
+## A Board is a (listof (listof Str))
+## Requires:
+##   The length of the outer list is 6.
+##   The length of each inner list is 7.
+##   Each string is '', 'Y', or 'R'.
+
+msg_draw = "Cat's Game!"
+msg_win = "{0} Won!"
+
+board = [[ ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+         [ ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+         [ ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+         [ ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+         [ ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+         [ ' ', ' ', ' ', ' ', ' ', ' ', ' ']]
+
+def place_piece(board, piece, place):
+  '''
+  Returns a new board if the column is not full. Otherwise, it returns None.
+
+  place_piece: Board Str Int -> (Anyof Board None)
+  '''
+  if board[5][place] == ' ':
+    board[5][place] = piece
+    return board
+  for i in range(5, -1, -1):
+    if board[i][place] == ' ':
+      board[i][place] = piece
+      return board
+  return 
+
+def board_full(board):
+  '''
+  Returns True if board is full (no empty strings left), and False otherwise
+  
+  board_full: Board -> Bool
+  '''
+  for i in range(6):
+    for j in range(7):
+      if board[i][j] == ' ' :
+        return False
+  return True      
+
+def row_win(board, how_many):
+  '''
+  Returns True if Board contains a win within a row, and False otherwise
+  
+  row_win: Board Nat -> Bool
+  '''
+  for i in range(len(board)):
+    colour = ''
+    for j in range(7):
+      if how_many == 4:
+        return True
+      if colour == board[i][j]:
+        if colour == ' ':
+          how_many = 0
+        else:
+          how_many += 1
+      else: 
+        how_many = 1
+        colour = board[i][j]
+      if how_many == 4:
+        return True
+  return False  
+  
+def col_win(board, how_many):
+  '''
+  Returns True if Board contains a win within a column, and False otherwise
+  
+  col_win: Board Nat -> Bool
+  '''
+  i = 5
+  j = 0
+  colour = ''
+  while j < 6:
+    if how_many == 4:
+      return True    
+    if colour == board[i][j]:
+      if colour == ' ':
+        how_many = 0
+      else:
+        how_many += 1
+    else: 
+      colour = board[i][j]
+      how_many = 1
+    i -= 1  
+    if i < 0:
+      i = 5
+      j += 1
+      colour = ''
+      how_many = 0
+
+  return False    
+      
+
+def diag_win(board):
+  '''
+  Returns True if Board contains a win within a diagonal, and False otherwise
+  
+  row_win: Board -> Bool
+  '''
+  for i in range(3):
+    for j in range(4):
+      diagonal = [board[i+k][j+k] for k in range(4)]
+      if diagonal[0] == diagonal[1] == diagonal[2] == diagonal[3]\
+      and diagonal[0] != ' ':
+        return True
+  for i in range(3):
+    for j in range(3, 7):
+      diagonal = [board[i+k][j-k] for k in range(4)]
+      if diagonal[0] == diagonal[1] == diagonal[2] == diagonal[3] \
+      and diagonal[0] != ' ':
+        return True
+  return False
+
+def make_board(board):
+  '''
+  Prints a board
+
+  Effects: Prints to screen
+
+  make_board: Board -> None
+  '''
+  for i in range(len(board)):
+    print(board[i])
+
+
+def connect4(board, piece):
+  '''
+  Takes in user input as a column, 
+  returns "Win" if board contains a win (four in a row) in a row, column, or diagonal,
+  returns "Draw" if the board is full and there are no wins,
+  and None otherwise.
+  
+  Effects:
+     Mutates board by adding the specified piece to the specified column
+  
+  connect4: Board Str(Anyof "Y" "R") -> None
+  
+  Examples:
+  board = [[ '',  '',  '',  '',  '',  '',  ''],
+         [ '',  '',  '',  '',  '',  '',  ''],
+         [ '',  '',  '',  '',  '',  '',  ''],
+         [ '', 'Y',  '',  '',  '',  '',  ''],
+         [ '', 'Y',  '',  '',  '',  '',  ''],
+         [ '', 'Y', 'R', 'R', 'R',  '',  '']]
+
+  connect4(board, 'Y') => "Win" if the input is 2
+  and board is changed to
+
+  [[ '',  '',  '',  '',  '',  '',  ''],
+  [ '',  '',  '',  '',  '',  '',  ''],
+  [ '', 'Y',  '',  '',  '',  '',  ''],
+  [ '', 'Y',  '',  '',  '',  '',  ''],
+  [ '', 'Y',  '',  '',  '',  '',  ''],
+  [ '', 'Y', 'R', 'R', 'R',  '',  '']]
+
+  board2 = [['Y', 'Y', 'Y', '', 'Y', 'Y', 'Y'],
+          ['R', 'R', 'R', 'Y', 'R', 'R', 'R'],
+          ['Y', 'Y', 'R', 'R', 'R', 'Y', 'R'],
+          ['R', 'R', 'Y', 'Y', 'R', 'R', 'Y'],
+          ['Y', 'Y', 'R', 'R', 'Y', 'Y', 'R'],
+          ['Y', 'Y', 'R', 'R', 'Y', 'R', 'Y']]
+         
+  connect4(board2, 'R') => "Draw" if the input is 4
+  and board2 is changed to
+
+  [['Y', 'Y', 'Y', 'R', 'Y', 'Y', 'Y'],
+  ['R', 'R', 'R', 'Y', 'R', 'R', 'R'],
+  ['Y', 'Y', 'R', 'R', 'R', 'Y', 'R'],
+  ['R', 'R', 'Y', 'Y', 'R', 'R', 'Y'],
+  ['Y', 'Y', 'R', 'R', 'Y', 'Y', 'R'],
+  ['Y', 'Y', 'R', 'R', 'Y', 'R', 'Y']]
+
+  board3 = [[ ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+         [ ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+         [ ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+         [ ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+         [ ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+         [ ' ', ' ', ' ', ' ', ' ', ' ', ' ']]
+  
+  connect4 (board2, 'Y') => None if the input is 3
+  and the board is changed to
+
+  [[ ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+  [ ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+  [ ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+  [ ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+  [ ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+  [ ' ', ' ', 'Y', ' ', ' ', ' ', ' ']]
+  '''
+  current_player = ' ' #For the winning message
+  if piece == 'Y':
+    current_player = 'Yellow'
+  else:
+    current_player = 'Red'
+    
+  #For Player input
+
+  number = int(input("Enter a valid column! ")) - 1
+ 
+  new_board = place_piece(board, piece, number)
+  if new_board == None:
+    print("Invalid Move!")
+    return connect4(board, piece)
+  else:
+    board = new_board
+    
+  ## Functional Code  
+  make_board(board)
+
+  if row_win(board, 0) == True:
+    print(msg_win.format(current_player))
+    
+  elif col_win(board, 0) == True:
+    print(msg_win.format(current_player))
+    
+  elif diag_win(board) == True:
+    print(msg_win.format(current_player))
+    
+  elif board_full(board) == True:
+    print(msg_draw)
+    
+  else:
+    if piece == 'Y':      
+      return connect4(board, 'R')
+    else:
+      return connect4(board, 'Y')
+
+connect4(board, 'Y')
